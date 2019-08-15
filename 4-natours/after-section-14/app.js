@@ -101,6 +101,7 @@ app.use((req, res, next) => {
 });
 
 // 3) ROUTES
+// ******************** Remember the router is a middleware also. That is why we do app.use ********************************
 app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
