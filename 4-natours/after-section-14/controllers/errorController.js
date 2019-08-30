@@ -56,40 +56,45 @@ const sendErrorDev = (err, req, res) => {
 
 const sendErrorProd = (err, req, res) => {
         // A) API
-        if (req.originalUrl.startsWith('/api')) {
-          // A) Operational, trusted error: send message to client
-          if (err.isOperational) {
-            return res.status(err.statusCode).json({
-              status: err.status,
-              message: err.message
-            });
-          }
+           if (req.originalUrl.startsWith('/api')) {
+                  // A) Operational, trusted error: send message to client
+                  if (err.isOperational) {
+                        return res.status(err.statusCode).json({
+                          status: err.status,
+                          message: err.message
+                        });
+                  }
+                    
+                    
           // B) Programming or other unknown error: don't leak error details
-          // 1) Log error
-          console.error('ERROR 💥', err);
-          // 2) Send generic message
-          return res.status(500).json({
-            status: 'error',
-            message: 'Something went very wrong!'
-          });
-        }
+                  // 1) Log error
+                        console.error('ERROR 💥', err);
+                  // 2) Send generic 500 message to client because you don't want to tell them about your programming error !!!!!! 
+                          return res.status(500).json({
+                            status: 'error',
+                            message: 'Something went very wrong!'
+                          });
+          }
 
+    
         // B) RENDERED WEBSITE
         // A) Operational, trusted error: send message to client
         if (err.isOperational) {
-          return res.status(err.statusCode).render('error', {
-            title: 'Something went wrong!',
-            msg: err.message
-          });
+              return res.status(err.statusCode).render('error', {               
+                title: 'Something went wrong!',
+                msg: err.message
+              });
         }
+        
+    
         // B) Programming or other unknown error: don't leak error details
         // 1) Log error
-        console.error('ERROR 💥', err);
+            console.error('ERROR 💥', err);
         // 2) Send generic message
-        return res.status(err.statusCode).render('error', {
-          title: 'Something went wrong!',
-          msg: 'Please try again later.'
-        });
+            return res.status(err.statusCode).render('error', {
+              title: 'Something went wrong!',
+              msg: 'Please try again later.'
+            });
 };
 
 // ***************** This middleware has 4 parameters so it is Express's centralized ERROR Middleware  *****************
