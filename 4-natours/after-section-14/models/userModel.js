@@ -53,15 +53,18 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre('save', async function(next) {
   // Only run this function if password was actually modified
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password')) return next();              // mongoose tells us if the password field was changed
 
   // Hash the password with cost of 12
-  this.password = await bcrypt.hash(this.password, 12);
+  this.password = await bcrypt.hash(this.password, 12);         // the higher the cost (cpu cost) the more secure
 
   // Delete passwordConfirm field
-  this.passwordConfirm = undefined;
+  // ******** Even though this field is specified as required in the schema, the mongoose middleware DOES NOT HAVE to respect that
+  //          By setting it to undefined, the field will NOT be present in the database. ******************************
+  this.passwordConfirm = undefined;                           
   next();
 });
+
 
 userSchema.pre('save', function(next) {
   if (!this.isModified('password') || this.isNew) return next();
