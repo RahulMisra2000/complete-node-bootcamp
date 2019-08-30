@@ -1,7 +1,9 @@
 const AppError = require('./../utils/appError');
 
-
-
+// ***************************************************** S T A R T *******************************************************************
+// ********************* Here we are taking the sensible pieces of error messages from the error created by Mongoose or anyone for that
+// matter and creating our custom error object (AppError) and populating it with error descriptions that will make sense to the 
+// client *****************************************************************************************************************************
 const handleCastErrorDB = err => {
     const message = `Invalid ${err.path}: ${err.value}.`;
     return new AppError(message, 400);
@@ -29,9 +31,7 @@ const handleJWTError = () =>
 const handleJWTExpiredError = () =>
   new AppError('Your token has expired! Please log in again.', 401);
 
-
-
-
+// ***************************************************** E N  D  *******************************************************************
 
 
 
@@ -108,6 +108,9 @@ module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
         sendErrorDev(err, req, res);
   } else if (process.env.NODE_ENV === 'production') {
+        
+        // **************** The reason for doing this is because it is always a good practice to not mutate arguments of a function ***
+        //                   err is being received by this function. So, we are shallow cloning it and then using it ******************
         let error = { ...err };
         error.message = err.message;
 
