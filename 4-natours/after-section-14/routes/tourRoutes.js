@@ -45,7 +45,12 @@ router
 router
   .route('/')
   .get(tourController.getAllTours)
-  .post(authController.protect, authController.restrictTo('admin', 'lead-guide'), tourController.createTour);
+ 
+  .post(authController.protect,                           // **** AUTHENTICATION middleware -- makes sure that all kosher with JWT
+        authController.restrictTo('admin', 'lead-guide'), //      AUTHORIZATION  middleware -- makes sure user has permissions to 
+                                                          //                                   do post on the resource
+        tourController.createTour                         //      WORK           middleware -- this middleware actually does the work
+       );
 
 router
   .route('/:id')
