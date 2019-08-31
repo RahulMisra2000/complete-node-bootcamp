@@ -140,8 +140,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   // ************************** GRANT ACCESS TO PROTECTED ROUTE
-  req.user = currentUser;
-  res.locals.user = currentUser;
+  req.user = currentUser;          //***** NOW from here on for this request all middlewares will be able to access the user record with ease
+  res.locals.user = currentUser;   //      I res.locals is available in V of MVC
   next();
 });
 
