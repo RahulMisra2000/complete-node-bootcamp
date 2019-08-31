@@ -79,6 +79,9 @@ userSchema.pre(/^find/, function(next) {
   next();
 });
 
+
+// *************** Methods being attached to the schema. These will be available on all User documents. *************
+//                 Inside these methods, this points to the document in question.
 userSchema.methods.correctPassword = async function(
   candidatePassword,
   userPassword
