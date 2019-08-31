@@ -104,15 +104,11 @@ userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
 };
 
 userSchema.methods.createPasswordResetToken = function() {
-  const resetToken = crypto.randomBytes(32).toString('hex');
+  const resetToken = crypto.randomBytes(32).toString('hex');        // **************** this will be emailed to the user
 
-  this.passwordResetToken = crypto
-    .createHash('sha256')
-    .update(resetToken)
-    .digest('hex');
-
-  // console.log({ resetToken }, this.passwordResetToken);
-
+  // ******* the one that will be sent to the user is then encrypted and placed in the user document in memory and will later,
+  //         by the method that called this method, save it to the database.
+  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
   return resetToken;
