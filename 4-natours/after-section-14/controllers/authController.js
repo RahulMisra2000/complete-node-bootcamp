@@ -6,11 +6,16 @@ const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const Email = require('./../utils/email');
 
+
+// ************************************************************ Create a jwt ************************************
 const signToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN
   });
 };
+
+
+
 
 const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
@@ -35,6 +40,8 @@ const createSendToken = (user, statusCode, req, res) => {
   });
 };
 
+
+// ******************* Create a User and at the same time send him a jwt *************************************************
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -43,23 +50,29 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm
   });
 
-  const url = `${req.protocol}://${req.get('host')}/me`;
-  // console.log(url);
+  const url = `${req.protocol}://${req.get('host')}/me`;  
   await new Email(newUser, url).sendWelcome();
 
   createSendToken(newUser, 201, req, res);
 });
 
+
+// ****************** Login a User ****************************************************************************************
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
-  // 1) Check if email and password exist
+  // 1) ************ Check if email and password were both provided in the request
   if (!email || !password) {
     return next(new AppError('Please provide email and password!', 400));
   }
-  // 2) Check if user exists && password is correct
+  
+  
+  // 2) ************* Get the user record from the database
   const user = await User.findOne({ email }).select('+password');
 
+  // ******* correctPassword() is a method that has been coded on the User SCHEMA and it is available to all documents from User collection
+  // ******* If no user record found or the password provided is incorrect then create an error object and invoke the 
+  //         centralized Error Middleware and return otherwise processing will continue below
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password', 401));
   }
@@ -67,6 +80,10 @@ exports.login = catchAsync(async (req, res, next) => {
   // 3) If everything ok, send token to client
   createSendToken(user, 200, req, res);
 });
+
+
+
+
 
 exports.logout = (req, res) => {
   res.cookie('jwt', 'loggedout', {
@@ -76,8 +93,10 @@ exports.logout = (req, res) => {
   res.status(200).json({ status: 'success' });
 };
 
+
+
 exports.protect = catchAsync(async (req, res, next) => {
-  // 1) Getting token and check of it's there
+  // 1) ********************** Getting the token from the request header and if it is NOT there then from the cookie
   let token;
   if (
     req.headers.authorization &&
@@ -88,16 +107,20 @@ exports.protect = catchAsync(async (req, res, next) => {
     token = req.cookies.jwt;
   }
 
+  
+  // ************ If no token was found then it means that the user is not logged in **********************************
   if (!token) {
     return next(
       new AppError('You are not logged in! Please log in to get access.', 401)
     );
   }
 
-  // 2) Verification token
+  
+  // 2) ********************** Now that we have the token, let's Verify it 
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-  // 3) Check if user still exists
+  
+  // 3) ********************** Check if user still exists
   const currentUser = await User.findById(decoded.id);
   if (!currentUser) {
     return next(
@@ -108,14 +131,15 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  // 4) Check if user changed password after the token was issued
+  
+  // 4) ********************** Check if user changed password after the token was issued
   if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError('User recently changed password! Please log in again.', 401)
     );
   }
 
-  // GRANT ACCESS TO PROTECTED ROUTE
+  // ************************** GRANT ACCESS TO PROTECTED ROUTE
   req.user = currentUser;
   res.locals.user = currentUser;
   next();
