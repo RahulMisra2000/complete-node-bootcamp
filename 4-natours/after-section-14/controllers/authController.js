@@ -194,21 +194,22 @@ exports.restrictTo = (...roles) => {
 
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
-  // 1) Get user based on POSTed email
+  // ***************************************************************************** 1) Get user based on POSTed email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
     return next(new AppError('There is no user with email address.', 404));
   }
 
-  // 2) Generate the random reset token
+  // ***************************************************************************** 2) Generate the random reset token
+  // ** This is a instance method on the User Schema. It creates a token to be sent to the user and also encrypts it and
+  //    places it in the user record in memory. That is why in code here we are saving the user in the database.
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  // 3) Send it to user's email
+  // ***************************************************************************** 3) Send it to user's email
   try {
-    const resetURL = `${req.protocol}://${req.get(
-      'host'
-    )}/api/v1/users/resetPassword/${resetToken}`;
+    const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+    
     await new Email(user, resetURL).sendPasswordReset();
 
     res.status(200).json({
@@ -227,8 +228,10 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
+
+
 exports.resetPassword = catchAsync(async (req, res, next) => {
-  // 1) Get user based on the token
+  // ***************************************************************************** 1) Get user based on the token
   const hashedToken = crypto
     .createHash('sha256')
     .update(req.params.token)
@@ -239,7 +242,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     passwordResetExpires: { $gt: Date.now() }
   });
 
-  // 2) If token has not expired, and there is user, set the new password
+  // ***************************************************************************** 2) If token has not expired, and there is user, set the new password
   if (!user) {
     return next(new AppError('Token is invalid or has expired', 400));
   }
