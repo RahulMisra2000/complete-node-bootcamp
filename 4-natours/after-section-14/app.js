@@ -78,6 +78,7 @@ app.use(mongoSanitize());
 app.use(xss());
 
 // ************************************************** Prevent parameter pollution
+// The following query string parameters can occur more than once in the url and the last one will be taken
 app.use(
   hpp({
     whitelist: [
