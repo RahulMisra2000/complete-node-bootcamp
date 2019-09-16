@@ -1,8 +1,8 @@
 doctype html
 html
   head
-    block head
-      meta(charset='UTF-8')
+    block head                                                                          // this can be overriden by other pug files
+      meta(charset='UTF-8')                                                             //****** element name (attributes)
       meta(name='viewport' content='width=device-width, initial-scale=1.0')
       link(rel='stylesheet' href='/css/style.css')
       link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
@@ -14,7 +14,7 @@ html
     include _header
 
     // CONTENT
-    block content
+    block content                                                                       // this can be overriden by other pug files
       h1 This is a placeholder heading
 
     // FOOTER
