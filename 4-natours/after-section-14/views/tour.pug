@@ -1,18 +1,19 @@
-extends base
-include _reviewCard
+extends base                //**** this is the parent template into which stuff from this file will be injected
+include _reviewCard         //**** just a regular include
 
-block append head
+block append head           //**** This block (the next 2 lines) will be injected at the end of the head block in the parent template
+                            //     which is base.pug
   script(src='https://api.mapbox.com/mapbox-gl-js/v0.54.0/mapbox-gl.js')
   link(href='https://api.mapbox.com/mapbox-gl-js/v0.54.0/mapbox-gl.css' rel='stylesheet')
 
-mixin overviewBox(label, text, icon)
+mixin overviewBox(label, text, icon)                      //*** think of a mixin as a function that we are defining
   .overview-box__detail
     svg.overview-box__icon
       use(xlink:href=`/img/icons.svg#icon-${icon}`)
     span.overview-box__label= label
     span.overview-box__text= text
 
-block content
+block content                       //*** Stuff inside this block will replace the content block in the parent pug template
   section.section-header
     .header__hero
       .header__hero-overlay &nbsp;
@@ -36,9 +37,11 @@ block content
       div
         .overview-box__group
           h2.heading-secondary.ma-bt-lg Quick facts
-
+          //******* The next line is called unbuffered in pug ... meaning its output does not get part of the template
+          //        it is ONLY used for doing some processing that will be later used in the template ...
+          //        in our example it is just calculating date and then later being used
           - const date = tour.startDates[0].toLocaleString('en-us', {month: 'long', year: 'numeric'})
-          +overviewBox('Next date', date, 'calendar')
+          +overviewBox('Next date', date, 'calendar')                   //**** This is how you call the mixin function
           +overviewBox('Difficulty', tour.difficulty, 'trending-up')
           +overviewBox('Participants', `${tour.maxGroupSize} people`, 'user')
           +overviewBox('Rating', `${tour.ratingsAverage} / 5`, 'star')
@@ -46,7 +49,7 @@ block content
         .overview-box__group
           h2.heading-secondary.ma-bt-lg Your tour guides
 
-          each guide in tour.guides
+          each guide in tour.guides                                     //**** LOOP in pug
             .overview-box__detail
               img.overview-box__img(src=`/img/users/${guide.photo}`, alt=`${guide.name}`)
 
@@ -85,7 +88,7 @@ block content
         h2.heading-secondary What are you waiting for?
         p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
         
-        if user
+        if user                   //******* Conditional in pug
           button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}`) Book tour now!
         else
           a.btn.btn--green.span-all-rows(href='/login') Log in to book tour
