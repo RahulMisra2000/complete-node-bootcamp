@@ -1,8 +1,11 @@
 footer.footer
-  .footer__logo
+  .footer__logo                                       //***** Nothing before a dot is telling pug to use the default div element
     img(src='/img/logo-green.png' alt='Natour logo')
   ul.footer__nav
     li: a(href='#') About us
+                                                      // *****  The above line is a short cut for 
+                                                      // *****  li
+                                                      //          a(href='#') About us
     li: a(href='#') Download apps
     li: a(href='#') Become a guide
     li: a(href='#') Careers
