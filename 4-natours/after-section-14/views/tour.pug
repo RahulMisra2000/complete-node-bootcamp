@@ -71,7 +71,18 @@ block content                       //*** Stuff inside this block will replace t
         img.picture-box__img(src=`/img/tours/${img}`, alt=`The Park Camper Tour ${i + 1}`, class=`picture-box__img--${i + 1}`)
 
   section.section-map
+    //*********** This is the same as 
+    //***********  <div id="map" data-locations=`${JSON.stringify(tour.locations)}`>
+    //***********  </div>
     #map(data-locations=`${JSON.stringify(tour.locations)}`)
+    // ********** The reason we are placing the tour.locations data in this custom data-* attribute is because from the client side
+    //            js file we can access this data when we create the map markers using the MapBox js library. If we did not do this
+    //            then we would have to make ajax calls from the js library and get the data from the server. Why bother, if the 
+    //            data is already available as is here.
+  
+
+
+
 
   section.section-reviews
     .reviews
