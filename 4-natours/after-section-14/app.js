@@ -66,9 +66,21 @@ app.post(
   bookingController.webhookCheckout
 );
 
-// ************************************************** Body parser, reading data from body into req.body
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+// **  ******** Body parsers, reading data from http req body into req.body ****************************************************
+
+//************* Getting json inside the http req body into req.body when the http request's content type = application/json
+app.use(express.json({ limit: '10kb' }));                                   
+
+
+//************ Getting form's values which are in http req body into req.body when http request's content type = application/x-www-form-urlencoded
+//             ie forms are posted using the default application/x-www-form-urlencoded way ***
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));         
+                                                                     
+// **  ******** Body parsers, reading data from http req body into req.body ****************************************************
+
+
+
+
 app.use(cookieParser());
 
 // ************************************************** Data sanitization against NoSQL query injection
