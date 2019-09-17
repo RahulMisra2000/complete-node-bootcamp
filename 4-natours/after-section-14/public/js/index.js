@@ -1,10 +1,20 @@
 /* eslint-disable */
+//*********** This is to allow ES6 features to work in older browsers ******************************************************
 import '@babel/polyfill';
+
+//*********** Importing functions from different modules so they can be called **********************************************
 import { displayMap } from './mapbox';
 import { login, logout } from './login';
 import { updateSettings } from './updateSettings';
 import { bookTour } from './stripe';
 import { showAlert } from './alerts';
+
+
+
+//********************* The job of this entrypoint js file is to register event handlers and delegate work to the **********
+//                      different modules 
+
+
 
 // DOM ELEMENTS
 const mapBox = document.getElementById('map');
@@ -14,7 +24,10 @@ const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const bookBtn = document.getElementById('book-tour');
 
-// DELEGATION
+
+
+
+// ************* REGISTER EVENT HANDLERS & DELEGATION FROM HERE ON ************************************************************
 if (mapBox) {
   const locations = JSON.parse(mapBox.dataset.locations);
   displayMap(locations);
