@@ -28,9 +28,17 @@ export const logout = async () => {
   try {
     const res = await axios({
       method: 'GET',
-      url: '/api/v1/users/logout'
+      url: '/api/v1/users/logout'           //**** Basically creates a new cookie without a jwt token in it and it is sent down  ****
     });
-    if ((res.data.status = 'success')) location.reload(true);
+    
+    
+    //**** true:  go to server and get the page again  and not from the cache. Because, the new updated cookie (see comment above)
+    //            will be sent to the server and the server will realize that the person is not logged in and so, 
+    //            the login/logout menu options will be appropriately turned on in the pug files and then sent down to the browser
+    if ((res.data.status = 'success')) location.reload(true);     
+                                                                  
+                                                                  
+ 
   } catch (err) {
     console.log(err.response);
     showAlert('error', 'Error logging out! Try again.');
