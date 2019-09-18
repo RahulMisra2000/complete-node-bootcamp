@@ -29,13 +29,10 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 // 1) GLOBAL MIDDLEWARES
+
 // Implement CORS
 app.use(cors());
-// Access-Control-Allow-Origin *
-// api.natours.com, front-end natours.com
-// app.use(cors({
-//   origin: 'https://www.natours.com'
-// }))
+// Access-Control-Allow-Origin * api.natours.com, front-end natours.com app.use(cors({origin: 'https://www.natours.com'}))
 
 app.options('*', cors());
 // app.options('/api/v1/tours/:id', cors());
@@ -73,7 +70,8 @@ app.use(express.json({ limit: '10kb' }));
 
 
 //************ Getting form's values which are in http req body into req.body when http request's content type = application/x-www-form-urlencoded
-//             ie forms are posted using the default application/x-www-form-urlencoded way ***
+//             ie forms are posted using the default enctype of application/x-www-form-urlencoded way ***
+//             DETOUR: For forms using multipart/form-data (used when using forms to upload files) you will need to use multer middleware
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));         
                                                                      
 // **  ******** Body parsers, reading data from http req body into req.body ****************************************************
@@ -115,12 +113,19 @@ app.use((req, res, next) => {
 
 // 3) ROUTES
 // ******************** Remember the router is a middleware also. That is why we do app.use ********************************
+
+//************************* For website views
 app.use('/', viewRouter);
+
+
+//************************* For REST API calls
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/bookings', bookingRouter);
 
+
+//************************* Catch all route
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
