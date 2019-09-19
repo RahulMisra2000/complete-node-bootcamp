@@ -1,4 +1,7 @@
+
+//********* Notice how we provide our api secrey key we got from Stripe
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
 const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
 const Booking = require('../models/bookingModel');
@@ -10,7 +13,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   const tour = await Tour.findById(req.params.tourId);
   // console.log(tour);
 
-  // 2) Create checkout session
+  //******************************************************************  2) Create checkout session
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     // success_url: `${req.protocol}://${req.get('host')}/my-tours/?tour=${
@@ -34,7 +37,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     ]
   });
 
-  // 3) Create session as response
+  //***************************************************************** 3) Send the checkout session back to the client code (browser)
   res.status(200).json({
     status: 'success',
     session
