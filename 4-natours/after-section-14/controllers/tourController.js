@@ -20,13 +20,22 @@ const upload = multer({
   fileFilter: multerFilter
 });
 
+//***** This is a middleware which will create req.files and via that we will have access to the files that have been 
+//      uploaded using a form or postman (basically multipart/formdata with  
+//      one   input field whose name is imageCover, type is file 
+//      three input fields all of whose names are images, type is file 
 exports.uploadTourImages = upload.fields([
   { name: 'imageCover', maxCount: 1 },
-  { name: 'images', maxCount: 3 }
+  { name: 'images',     maxCount: 3 }
 ]);
 
-// upload.single('image') req.file
-// upload.array('images', 5) req.files
+//***** This you would use if you were uploading one file
+// upload.single('image')                     req.file
+
+//***** These you would use if you were uploading multiple files of just one field name
+// upload.array('images', 5)                  req.files
+
+
 
 exports.resizeTourImages = catchAsync(async (req, res, next) => {
   if (!req.files.imageCover || !req.files.images) return next();
