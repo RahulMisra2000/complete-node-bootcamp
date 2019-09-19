@@ -23,5 +23,9 @@ html
     //- script(src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js')
     //- script(src='/js/mapbox.js')
     //- script(src='/js/login.js')
+    
+    //********* I think the reason we have to provide this library separately is because, i think stripe has NOT been recoded in 
+    //          ES6 module format ...ie import/export and therefore the parecel-builder OR any module builder for that matter
+    //          cannot know of the depenedency and therefore cannot build the single bundle in the correct order.
     script(src='https://js.stripe.com/v3/')
     script(src='/js/bundle.js')
