@@ -14,10 +14,10 @@ const factory = require('./handlerFactory');
 //     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
 //   }
 // });
-const multerStorage = multer.memoryStorage();
-
+const multerStorage = multer.memoryStorage();     //*** upload the file into memory because we are going to process it before saving it
+                                                  //    the file can be accessed from req.file.buffer
 const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
+  if (file.mimetype.startsWith('image')) {        //*** Only accept uploaded file if its MIME type is image....
     cb(null, true);
   } else {
     cb(new AppError('Not an image! Please upload only images.', 400), false);
@@ -29,18 +29,22 @@ const upload = multer({
   fileFilter: multerFilter
 });
 
+//***** upload.single() returns a middleware
 exports.uploadUserPhoto = upload.single('photo');
 
+
+//***** another middleware that persists the uploaded image file after processing it 
 exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
 
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
 
-  await sharp(req.file.buffer)
+  //***** sharp npm package is for image processing. Here we are using it to resize the uploaded file
+  await sharp(req.file.buffer)                          //**** location of the image file in memory
     .resize(500, 500)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
-    .toFile(`public/img/users/${req.file.filename}`);
+    .toFile(`public/img/users/${req.file.filename}`);   //*** persist it to this location with this name
 
   next();
 });
