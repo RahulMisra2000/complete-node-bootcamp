@@ -1,5 +1,11 @@
 const mongoose = require('mongoose');
+
+
+// ***** This does not work when we host our application in some places like HEROKU for example.
+//       There we either use the Heroku CLI and add the environment variables like so ...  heroku config:set key value
+//       or we go into our Heroku dashboard and set them up there
 const dotenv = require('dotenv');
+
 
 // ********************************* This handler should be the FIRST thing *******************************
 process.on('uncaughtException', err => {
@@ -45,9 +51,13 @@ process.on('unhandledRejection', err => {
 });
 
 
+//*********** Remember, Heroku every 24 hours sends a sigterm to our application for health reasons and then immediately 
+//*********** restarts
 process.on('SIGTERM', () => {
     console.log('👋 SIGTERM RECEIVED. Shutting down gracefully');
     server.close(() => {
         console.log('💥 Process terminated!');
+        //************* Here we don't do a process.exit(with code) BECAUSE that is what SIGTERM does. It is telling us that 
+        // a termination signal has just been received by our process so there is NO NEED for us to do a process.exit 
     });
 });
