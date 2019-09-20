@@ -27,5 +27,19 @@ html
     //********* I think the reason we have to provide this library separately is because, i think stripe has NOT been recoded in 
     //          ES6 module format ...ie import/export and therefore the parecel-builder OR any module builder for that matter
     //          cannot know of the depenedency and therefore cannot build the single bundle in the correct order.
+    
+    // ******** I asked the question and got this response
+    
+    // What I am asking is why can't we have the stripe's js library as part of the bundle.js ? Why have it as a separate download ? 
+    // Is it because the stripe's js file has not been coded in ES6 format and therefore does not lend itself to an import. 
+    // That was my question ....
+
+
+    //Adam — Teaching Assistant · 11 minutes agoAnswer
+    // Oh, I see what you mean. Stripe won't let you bundle their script because of PCI compliance. 
+    // Basically, companies that manage cards/payments need to adhere to strict regulations and Stripe handles that for you. 
+    // As a result, the script must come from their PCI compliant servers DIRECTLY and all requests go through Stripe so
+    // you never see or touch the customer's payment data.
+
     script(src='https://js.stripe.com/v3/')
     script(src='/js/bundle.js')
