@@ -23,17 +23,27 @@ const viewRouter = require('./routes/viewRoutes');
 // Start express app
 const app = express();
 
+//****** HEROKU needs this 
 app.enable('trust proxy');
+
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 // 1) GLOBAL MIDDLEWARES
 
-// Implement CORS
+//**** Remember it is a middleware that just adds some headers to the http response which the browser reads to determine
+//     if the request should go through.
+//     Since it is a middleware, it could be specified at the route level instead of here where it applies to all the routes
+//     Also note, that is ONLY applies to requests coming from a browser and NOT other clients or servers.
 app.use(cors());
 // Access-Control-Allow-Origin * api.natours.com, front-end natours.com app.use(cors({origin: 'https://www.natours.com'}))
 
+// ****** Browsers will send a pre-flight request when the SOP is violated in the case of non-safe http verbs
+//        like update (patch, put) and delete and in cases of cookies and special headers ... something like that
+//        We need to respond to them as well. In app.options .. options is the pre-flight http verb ... just like how we 
+//        have app.get, app.post ..... etc ..although that is the simple way of setting up route without using the professional way
+//        of using the express router... I am just explaining the syntax here
 app.options('*', cors());
 // app.options('/api/v1/tours/:id', cors());
 
@@ -56,11 +66,17 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);       //* 
 
-// Stripe webhook, BEFORE body-parser, because stripe needs the body as stream
+//***********************************  Stripe webhook, BEFORE body-parser, because stripe ***NEEDS*** the body as stream
+//**** Basically if we get an http post request to the /webhook-checkout route
+//**** The author said insted of using bodyParser.raw we could just use express.raw middleware
 app.post(
   '/webhook-checkout',
   bodyParser.raw({ type: 'application/json' }),
-  bookingController.webhookCheckout
+  bookingController.webhookCheckout             //*** The code in here uses the stripe library which needs the body as RAW
+                                                //    and so we have to do it HERE BEFORE the other parsers get hold of the 
+                                                //    request. In fact, in webhookCheckout middleware we will be sending the
+                                                //    response back to the caller (HEROKU) and NOT doing a next() and so the 
+                                                //    the req/res cycle will end right here.
 );
 
 // **  ******** Body parsers, reading data from http req body into req.body ****************************************************
